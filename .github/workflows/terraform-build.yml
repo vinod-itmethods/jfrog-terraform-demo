@@ -38,7 +38,10 @@ jobs:
           TERRAFORM_AUTH_TOKEN: ${{ secrets.JFROG_TOKEN }}
         run: |
           echo 'username="__token__"' >> backend.tfvars
-          echo 'password="$TERRAFORM_AUTH_TOKEN"' >> backend.tfvars
+          echo 'password="'$TERRAFORM_AUTH_TOKEN'"' >> backend.tfvars
+          echo 'address="https://artifactory.stage.0658b-techopscore.com/artifactory/terraform-appcode-dev/terraform.tfstate"' >> backend.tfvars
+          echo 'lock_address="https://artifactory.stage.0658b-techopscore.com/artifactory/terraform-appcode-dev/lock"' >> backend.tfvars
+          echo 'unlock_address="https://artifactory.stage.0658b-techopscore.com/artifactory/terraform-appcode-dev/unlock"' >> backend.tfvars
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
