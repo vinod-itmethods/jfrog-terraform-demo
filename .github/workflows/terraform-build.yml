@@ -1,0 +1,59 @@
+name: Terraform Build and Store State in Artifactory
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read  
+  id-token: write  
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install JFrog CLI
+        run: |
+          curl -fL https://getcli.jfrog.io | sh
+          chmod +x jfrog
+          mv jfrog /usr/local/bin/
+
+      - name: Authenticate JFrog CLI Using Access Token
+        env:
+          JFROG_USER: ${{ secrets.JFROG_USER }}
+          JFROG_TOKEN: ${{ secrets.JFROG_TOKEN }}
+        run: |
+          export JFROG_CLI_OFFER_CONFIG=false
+          jfrog config add my-artifactory \
+            --url=https://artifactory.stage.0658b-techopscore.com \
+            --access-token=$JFROG_TOKEN \
+            --interactive=false
+
+      - name: Configure Terraform Backend Authentication
+        env:
+          TERRAFORM_AUTH_TOKEN: ${{ secrets.JFROG_TOKEN }}
+        run: |
+          echo 'username="__token__"' >> backend.tfvars
+          echo 'password="$TERRAFORM_AUTH_TOKEN"' >> backend.tfvars
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.5
+
+      - name: Initialize Terraform
+        run: terraform init -backend-config=backend.tfvars
+
+      - name: Plan Terraform
+        run: terraform plan
+
+      - name: Apply Terraform
+        run: terraform apply -auto-approve
+
+      - name: Store Terraform State in Artifactory
+        run: |
+          jfrog rt upload "terraform.tfstate" "terraform-appcode-dev/"
