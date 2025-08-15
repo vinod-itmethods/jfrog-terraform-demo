@@ -7,7 +7,7 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Build') {
+        stage('Build1') {
             steps {
                 echo 'Building...'
                 // Add your build steps here, e.g. sh 'terraform init'
