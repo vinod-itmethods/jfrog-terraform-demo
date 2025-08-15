@@ -9,26 +9,26 @@ pipeline {
         }
         stage('Build') {
             steps {
-                echo 'Building1...'
+                echo 'Building...'
                 // Add your build steps here, e.g. sh 'terraform init'
             }
         }
         stage('Test') {
             steps {
-                echo 'Testing1...'
+                echo 'Testing...'
                 // Add your test steps here
             }
         }
         stage('Deploy') {
             steps {
-                echo 'Deploying1...'
+                echo 'Deploying...'
                 // Add your deploy steps here
             }
         }
     }
     post {
         always {
-            echo 'Pipeline 1 finished.'
+            echo 'Pipeline finished.'
         }
     }
 }
